@@ -3,7 +3,7 @@
 
 ## Description
 
-This web app allows users to search for Pokemon by name or ID. It interacts with the [PokeAPI](https://pokeapi.co/) to fetch data about the requested Pokémon, including its name, type, and image. The information is dynamically displayed on the page, and error handling is provided for invalid inputs or when the Pokemon is not found.
+This web app allows users to search for Pokemon by name or ID. It interacts with the [PokeAPI](https://pokeapi.co/) to fetch data about the requested Pokemon, including its name, type, and image. The information is dynamically displayed on the page, and error handling is provided for invalid inputs or when the Pokemon is not found.
 
 ## Features
 
