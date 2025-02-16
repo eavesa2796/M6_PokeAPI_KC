@@ -149,6 +149,16 @@ This web app allows users to search for Pokemon by name or ID. It interacts with
       searchButton.disabled = false; // Re-enable the search button
     }
   }
+...
+// Add event listener for search button click
+  searchButton.addEventListener("click", handleSearch);
+
+  // Allow pressing "Enter" to trigger the search
+  inputField.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
+  });
 ```
 
 ## Installation
