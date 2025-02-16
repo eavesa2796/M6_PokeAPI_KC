@@ -43,13 +43,34 @@ This web app allows users to search for Pokemon by name or ID. It interacts with
 - **Error Handling**: Shows an error message and fallback image if the Pokemon is not found.
 
 ```html
-<input id="pokemonNameOrId" type="text" placeholder="Enter the name or ID" />
-<button id="submitBtn">Search</button>
-<div id="imageArea" class="image-area d-none">
-  <img id="pokemonImage" src="images/sad-pokemon.png" alt="Pokemon Image" />
-  <p id="pokemonName"></p>
-  <p id="pokemonType"></p>
-</div>
+        <input
+          id="pokemonNameOrId"
+          type="text"
+          class="form-control mb-3"
+          id="formControlInput"
+          placeholder="Enter the name or ID"
+        />
+        <button type="submit" id="submitBtn" class="btn btn-primary w-100">
+          Search
+        </button>
+        <div id="imageArea" class="image-area d-none mt-5 py-4">
+          <div class="overlay">
+            <img
+              id="pokemonImage"
+              class="pokemon-image floating"
+              src="images/sad-pokemon.png"
+              alt="Pokemon Image"
+            />
+            <p
+              id="pokemonName"
+              class="content text-end text-dark fw-bold me-3"
+            ></p>
+            <p
+              id="pokemonType"
+              class="content text-end text-dark fw-bold me-3"
+            ></p>
+          </div>
+        </div>
 ```
 
 ### CSS
@@ -61,13 +82,17 @@ This web app allows users to search for Pokemon by name or ID. It interacts with
 .pokemon-image {
   width: 300px;
   margin-left: 20%;
-  animation: float 2s ease-in-out infinite;
 }
-
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
 }
 ```
 
@@ -78,23 +103,52 @@ This web app allows users to search for Pokemon by name or ID. It interacts with
 - **Event Listeners**: Supports both button clicks and "Enter" key presses to trigger the search.
 
 ```javascript
-async function getNameOrId(pokemon) {
-  try {
-    const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon}`);
-    if (!response.ok) throw new Error("Pokemon not found!");
-    const data = await response.json();
-    document.getElementById("pokemonName").textContent = `Name: ${data.name.toUpperCase()}`;
-    document.getElementById("pokemonImage").src = data.sprites.front_default;
-    document.getElementById("pokemonType").textContent = `Type: ${data.types[0].type.name.toUpperCase()}`;
-    document.getElementById("imageArea").classList.remove("d-none");
-  } catch (error) {
-    console.error("Problem fetching:", error.message);
-    document.getElementById("pokemonImage").src = "/images/sad-pokemon.png";
-    document.getElementById("pokemonName").textContent = "Problem fetching that Pokémon, please try again.";
-    document.getElementById("pokemonType").textContent = "No Type Available";
-    document.getElementById("imageArea").classList.remove("d-none");
+  async function getNameOrId(pokemon) {
+    try {
+      searchButton.disabled = true; // Disable button to prevent multiple requests while fetching
+
+      // Determine whether the input is a number (ID) or a string (name)
+      const query = isNaN(pokemon) ? pokemon.toLowerCase() : pokemon;
+      const response = await fetch(
+        `https://pokeapi.co/api/v2/pokemon/${query}`
+      );
+
+      // Check if the response is valid; otherwise, throw an error
+      if (!response.ok) {
+        throw new Error(`Pokemon not found! (${response.status})`);
+      }
+
+      const data = await response.json(); // Convert response to JSON
+
+      // Update the displayed Pokemon name
+      pokemonName.textContent = `Name: ${data.name.toUpperCase()}`;
+
+      // Set the Pokemon image, or display a fallback image if unavailable
+      pokemonImage.src =
+        data.sprites?.front_default || "/images/sad-pokemon.png";
+      pokemonImage.alt = data.name;
+
+      // Display Pokemon type
+      pokemonType.textContent = `Type: ${data.types[0].type.name.toUpperCase()}`;
+
+      // Ensure the image area is visible
+      imageArea.classList.remove("d-none");
+    } catch (error) {
+      console.error("Problem fetching:", error.message);
+
+      // Handle error: show a fallback image and display an error message
+      pokemonImage.src = "/images/sad-pokemon.png";
+      pokemonImage.alt = "Pokemon Not Found";
+      pokemonName.textContent =
+        "Problem fetching that Pokemon, please try again.";
+      pokemonType.textContent = "No Type Available";
+
+      // Ensure the image area is visible even when an error occurs
+      imageArea.classList.remove("d-none");
+    } finally {
+      searchButton.disabled = false; // Re-enable the search button
+    }
   }
-}
 ```
 
 ## Installation
